@@ -1,17 +1,22 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
-const BookingSchema = new mongoose.Schema({
-  customerName: String,
-  numberOfGuests: Number,
-  bookingDate: String,
-  bookingTime: String,
-  cuisinePreference: String,
-  specialRequests: String,
+const BookingSchema = new mongoose.Schema(
+  {
+    customerName: { type: String, required: true },
+    numberOfGuests: { type: Number, required: true },
+    bookingDate: { type: String, required: true },
+    bookingTime: { type: String, required: true },
+    cuisinePreference: { type: String },
+    specialRequests: { type: String },
 
-  weatherInfo: Object,
-  seatingPreference: String, // indoor / outdoor
-  status: { type: String, default: "confirmed" },
-  createdAt: { type: Date, default: Date.now },
-});
+    weatherInfo: {
+      temp: { type: Number },
+      description: { type: String },
+    },
 
-export default mongoose.model("Booking", BookingSchema);
+    seatingPreference: { type: String, default: "indoor" },
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model("Booking", BookingSchema);

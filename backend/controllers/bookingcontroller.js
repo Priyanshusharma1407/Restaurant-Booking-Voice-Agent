@@ -1,10 +1,7 @@
-import Booking from "../models/booking.js";
-import { getWeatherForDate } from "../utils/weather.js";
+const Booking = require("../models/booking");
+const { getWeatherForDate } = require("../utils/weather");
 
-// -----------------------------------------
-// POST /api/bookings  ✔
-// -----------------------------------------
-export const createBooking = async (req, res) => {
+exports.createBooking = async (req, res) => {
   try {
     const {
       customerName,
@@ -16,72 +13,82 @@ export const createBooking = async (req, res) => {
       city,
     } = req.body;
 
-    // Fetch weather
-    const weather = await getWeatherForDate(city);
-
-    // Seating logic
-    let seating = "indoor";
-    if (weather && weather.description.includes("clear")) {
-      seating = "outdoor";
+    if (!customerName || !numberOfGuests || !bookingDate || !bookingTime) {
+      return res.status(400).json({ error: "Missing required fields" });
     }
 
-    const booking = await Booking.create({
+    console.log("Creating booking for:", customerName, "City:", city);
+
+    // Fetch Weather (Celsius + description)
+    const weather = await getWeatherForDate(city);
+
+    let tempC = null;
+    let description = "unknown";
+    let seatingPreference = "indoor";
+
+    if (weather) {
+      tempC = Math.round(weather.temp);
+      description = weather.description;
+
+      if (tempC >= 22 && description.includes("clear")) {
+        seatingPreference = "outdoor";
+      }
+    }
+
+    // Save to DB
+    const newBooking = await Booking.create({
       customerName,
       numberOfGuests,
       bookingDate,
       bookingTime,
       cuisinePreference,
       specialRequests,
-      weatherInfo: weather,
-      seatingPreference: seating,
-      status: "confirmed",
+      weatherInfo: {
+        temp: tempC,
+        description,
+      },
+      seatingPreference,
     });
 
-    res.json(booking);
-  } catch (err) {
-    console.error("Error creating booking:", err);
+    console.log("Booking saved:", newBooking._id);
+
+    res.json(newBooking);
+  } catch (error) {
+    console.error("Error creating booking:", error);
     res.status(500).json({ error: "Server error" });
   }
 };
 
-// -----------------------------------------
-// GET /api/bookings  ✔
-// -----------------------------------------
-export const getAllBookings = async (req, res) => {
-  const bookings = await Booking.find().sort({ createdAt: -1 });
-  res.json(bookings);
-};
-
-// -----------------------------------------
-// GET /api/bookings/:id  ✔
-// -----------------------------------------
-export const getBookingById = async (req, res) => {
+exports.getAllBookings = async (req, res) => {
   try {
-    const booking = await Booking.findById(req.params.id);
-
-    if (!booking) {
-      return res.status(404).json({ message: "Booking not found" });
-    }
-
-    res.json(booking);
-  } catch (err) {
-    res.status(400).json({ message: "Invalid booking ID" });
+    const bookings = await Booking.find().sort({ createdAt: -1 });
+    res.json(bookings);
+  } catch (error) {
+    console.error("Error fetching bookings:", error);
+    res.status(500).json({ error: "Server error" });
   }
 };
 
-// -----------------------------------------
-// DELETE /api/bookings/:id  ✔
-// -----------------------------------------
-export const deleteBooking = async (req, res) => {
+exports.getBookingById = async (req, res) => {
   try {
-    const booking = await Booking.findByIdAndDelete(req.params.id);
+    const booking = await Booking.findById(req.params.id);
+    if (!booking) return res.status(404).json({ error: "Not found" });
 
-    if (!booking) {
-      return res.status(404).json({ message: "Booking not found" });
-    }
+    res.json(booking);
+  } catch (error) {
+    console.error("Error fetching booking:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
 
-    res.json({ message: "Booking deleted successfully" });
-  } catch (err) {
-    res.status(400).json({ message: "Invalid booking ID" });
+exports.deleteBooking = async (req, res) => {
+  try {
+    const deleted = await Booking.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ error: "Not found" });
+
+    res.json({ message: "Booking deleted" });
+  } catch (error) {
+    console.error("Error deleting booking:", error);
+    res.status(500).json({ error: "Server error" });
   }
 };

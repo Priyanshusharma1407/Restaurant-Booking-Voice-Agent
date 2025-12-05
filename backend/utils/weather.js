@@ -1,19 +1,19 @@
-import axios from "axios";
+const axios = require("axios");
 
-export const getWeatherForDate = async (city) => {
+async function getWeatherForDate(city) {
   try {
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(
-      city
-    )}&appid=${process.env.OPENWEATHER_API_KEY}&units=metric`;
-
-    const resp = await axios.get(url);
+    const resp = await axios.get(
+      `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${process.env.OPENWEATHER_API_KEY}&units=metric`
+    );
 
     return {
-      description: resp.data.weather[0].description,
       temp: resp.data.main.temp,
+      description: resp.data.weather[0].description,
     };
-  } catch (err) {
-    console.error("Weather API error:", err.response?.data || err.message);
+  } catch (error) {
+    console.error("Weather fetch error:", error.message);
     return null;
   }
-};
+}
+
+module.exports = { getWeatherForDate };
