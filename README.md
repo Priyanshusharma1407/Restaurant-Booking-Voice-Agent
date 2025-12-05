@@ -1,191 +1,194 @@
-Restaurant Booking Voice Agent — Full Stack Project
+# Restaurant Booking Voice Agent — Full Stack Project
+A voice-enabled restaurant booking system that allows users to create reservations using natural speech. The project includes a Python-based voice agent, a Node.js backend with MongoDB Atlas, and real-time weather integration.
 
-A voice-enabled restaurant booking system that allows users to create reservations using natural speech.
-The project includes a Python-based voice agent, a Node.js backend with MongoDB Atlas, and real-time weather integration.
+## Features
 
-Features
-Voice Agent
+### Voice Agent
+- Captures and transcribes speech using Groq Whisper.
+- Responds with text-to-speech using Groq TTS.
+- Extracts booking details using LLM assistance.
+- Guides the user through the booking process:
+  - Name
+  - Number of guests
+  - Preferred date
+  - Preferred time
+  - Cuisine preference
+  - Special requests
+- Confirms the booking before submission.
 
-Captures and transcribes speech using Groq Whisper.
+### Backend (Node.js + Express)
+- Stores booking details in MongoDB Atlas.
+- Fetches real-time weather (temperature + description) using OpenWeather API.
+- Suggests indoor/outdoor seating based on weather conditions.
+- Provides REST API endpoints:
+  - POST /api/bookings – Create a booking
+  - GET /api/bookings – Get all bookings
+  - GET /api/bookings/:id – Get a specific booking
+  - DELETE /api/bookings/:id – Delete a booking
 
-Responds with text-to-speech using Groq TTS.
+### Database
+MongoDB Atlas stores:
+- Customer name
+- Guests count
+- Date & time
+- Cuisine preference
+- Special requests
+- Weather info
+- Seating suggestion
 
-Extracts booking details using LLM assistance.
+## Project Structure
 
-Guides the user through the booking process:
-
-Name
-
-Number of guests
-
-Preferred date
-
-Preferred time
-
-Cuisine preference
-
-Special requests
-
-Confirms the booking before submission.
-
-Backend (Node.js + Express)
-
-Stores booking details in MongoDB Atlas.
-
-Fetches real-time weather (temperature + description) using OpenWeather API.
-
-Automatically suggests indoor/outdoor seating depending on weather conditions.
-
-Provides REST API endpoints:
-
-POST /api/bookings – Create a booking
-
-GET /api/bookings – Get all bookings
-
-GET /api/bookings/:id – Get a specific booking
-
-DELETE /api/bookings/:id – Delete a booking
-
-Database
-
-MongoDB Atlas (cloud-hosted, no local MongoDB required)
-
-Stores:
-
-Customer name
-
-Guests count
-
-Date & time
-
-Cuisine preference
-
-Special requests
-
-Weather info
-
-Seating suggestion
-
-Project Structure
+```
 voice-agent/
 │   agent.py
 │   .env
 │   venv/
-│
+
 backend/
 │   server.js
 │   package.json
-│
+
 │── controllers/
 │      bookingcontroller.js
-│
+
 │── routes/
 │      bookingRoutes.js
-│
+
 │── models/
 │      Booking.js
-│
+
 │── utils/
        db.js
        weather.js
+```
 
-Setup Instructions
-1. Clone the repository
+## Setup Instructions
+
+### 1. Clone the repository
+
+```
 git clone <your-repo-url>
 cd <project-folder>
+```
 
-Backend Setup (Node + Express + MongoDB Atlas)
-2. Install backend dependencies
+## Backend Setup (Node + Express + MongoDB Atlas)
+
+### 2. Install backend dependencies
+
+```
 cd backend
 npm install
+```
 
-3. Create a .env file inside backend/
+### 3. Create a `.env` file inside `backend/`
+
+```
 MONGO_URI=your_mongodb_atlas_connection_string
 OPENWEATHER_API_KEY=your_openweather_api_key
 PORT=5000
+```
 
-4. Start backend server
+### 4. Start backend server
+
+```
 node server.js
+```
 
+Expected output:
 
-If successful, you should see:
-
+```
 Backend running on http://localhost:5000
 Connected to MongoDB Atlas
+```
 
-Voice Agent Setup (Python)
-5. Install Python dependencies
+## Voice Agent Setup (Python)
+
+### 5. Install Python dependencies
+
+```
 cd voice-agent
 pip install -r requirements.txt
+```
 
-6. Create .env inside voice-agent/
+### 6. Create `.env` inside `voice-agent/`
+
+```
 GROQ_API_KEY=your_groq_api_key
 OPENWEATHER_API_KEY=your_openweather_api_key
+```
 
-7. Run agent
+### 7. Run agent
+
+```
 python agent.py
+```
 
+## API Endpoints
 
-The assistant will greet you and start listening.
-
-API Endpoints
-Create Booking
+### Create Booking
+```
 POST /api/bookings
+```
 
-Get All Bookings
+### Get All Bookings
+```
 GET /api/bookings
+```
 
-Get Booking by ID
+### Get Booking by ID
+```
 GET /api/bookings/:id
+```
 
-Delete Booking
+### Delete Booking
+```
 DELETE /api/bookings/:id
+```
 
-Technologies Used
-Frontend (Voice Agent)
+## Technologies Used
 
-Python
+### Frontend (Voice Agent)
+- Python
+- Groq Whisper (Speech-to-Text)
+- Groq TTS (Text-to-Speech)
+- LLM for detail extraction
 
-Groq Whisper (Speech-to-Text)
+### Backend
+- Node.js
+- Express.js
+- MongoDB Atlas
+- OpenWeather API
 
-Groq TTS (Text-to-Speech)
+### Database
+- MongoDB Atlas
+- Mongoose ORM
 
-LLM extraction for details
+## System Workflow
 
-Backend
+1. User speaks their booking request.
+2. Voice agent transcribes and extracts necessary details.
+3. Agent asks follow-up questions until all data is collected.
+4. Agent presents a summary for confirmation.
+5. On confirmation, backend fetches weather + saves booking.
+6. MongoDB Atlas stores all details.
+7. Agent receives weather-based seating recommendation and announces final confirmation.
 
-Node.js
+## Deployment Options
 
-Express.js
+Backend can be deployed on:
+- Render
+- Railway
+- Vercel
+- AWS EC2
 
-MongoDB Atlas
+Python agent runs locally.
 
-OpenWeather API
+## Submission Notes
 
-Database
-
-MongoDB Atlas
-
-Mongoose ORM
-
-How the System Works
-
-User speaks their booking request.
-
-Voice agent transcribes and extracts details.
-
-If any detail is missing, the agent asks follow-up questions.
-
-Once complete, agent confirms the summary.
-
-On "yes", booking is sent to backend.
-
-Backend:
-
-Fetches weather
-
-Decides indoor/outdoor
-
-Saves to MongoDB Atlas
-
-Backend returns the final booking, which the agent speaks aloud.
+This project demonstrates:
+- Real-time speech recognition
+- LLM-assisted data extraction
+- Full-stack integration
+- External API usage
+- Cloud database operations
+- Clean architecture
